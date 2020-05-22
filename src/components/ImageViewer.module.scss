@@ -1,0 +1,20 @@
+.root {
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas: 'gallery'
+    'footer';
+}
+
+.gallery {
+    grid-area: 'gallery';
+}
+
+.footer {
+    grid-area: 'footer';
+    padding: 1em;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
