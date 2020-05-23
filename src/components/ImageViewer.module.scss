@@ -8,11 +8,14 @@
 }
 
 .gallery {
-    grid-area: 'gallery';
+    grid-area: gallery;
+    display:flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .footer {
-    grid-area: 'footer';
+    grid-area: footer;
     padding: 1em;
     display: flex;
     justify-content: space-around;

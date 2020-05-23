@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "dev": "nodemon --watch ./src --exec \"electron .\""
+    "dev": "nodemon --watch ./src --exec \"npm run start\""
   },
   "eslintConfig": {
     "extends": "react-app"

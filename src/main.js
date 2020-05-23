@@ -12,6 +12,8 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
+        fullscreen: true,
+        title: "Gallery Viewer",
         webPreferences: {
             nodeIntegration: true,
             preload: __dirname + '/preload.js',
@@ -106,10 +108,8 @@ async function openFile() {
     })
 
     const file = filePaths[0]
-    console.log(file)
     if (!file) return;
 
-    const image = "data:image/png;base64," + fs.readFileSync(file.toString()).toString('base64')
     mainWindow.webContents.send('select-file', image)
 }
 
@@ -121,8 +121,8 @@ async function openFolder() {
             extensions: ['jpg', 'png', 'jpeg']
         }]
     })
-    // const directoryPath = filePaths[0]
-    // const images = fs.readdirSync(directoryPath).map(image => path.join(directoryPath, image))
-    console.log(filePaths[0])
-    mainWindow.webContents.send('select-folder', filePaths[0])
+
+    const folder = filePaths[0]
+    if (!folder) return
+    mainWindow.webContents.send('select-folder', folder)
 }
