@@ -11,15 +11,17 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
-  "main": "src/main.js",
+  "main": "main.js",
   "homepage": "./",
   "scripts": {
-    "start": "concurrently \"set BROWSER=\"none\" && react-scripts start\" \"set ELECTRON_START_URL=http://localhost:3000 && electron .\"",
+    "start": "concurrently \"set BROWSER=none && react-scripts start\" \"set ELECTRON_START_URL=http://localhost:3000 && electron .\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "dev": "nodemon --watch ./src --exec \"npm run start\""
+    "dev": "nodemon --watch ./src --exec \"npm run start\"",
+    "precompile": "react-scripts build",
+    "compile": "electron-packager . \"Gallery Viewer\" --platform=win32 --arch=x64 --ignore=/src --ignore=/node_modules --no-prune --overwrite --out ./executable"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -39,6 +41,7 @@
   "devDependencies": {
     "concurrently": "^5.2.0",
     "electron": "^9.0.0",
+    "electron-packager": "^14.2.1",
     "electron-reload": "^1.5.0",
     "nodemon": "^2.0.4"
   }

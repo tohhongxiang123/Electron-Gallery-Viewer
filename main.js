@@ -12,18 +12,17 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
-        fullscreen: true,
         title: "Gallery Viewer",
         webPreferences: {
             nodeIntegration: true,
-            preload: __dirname + '/preload.js',
+            preload: __dirname + '/src/preload.js',
             webSecurity: false
         }
     });
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
-        pathname: path.join(__dirname, '/../build/index.html'),
+        pathname: path.join(__dirname, '/build/index.html'),
         protocol: 'file:',
         slashes: true
     });
@@ -60,7 +59,7 @@ function createWindow() {
     Menu.setApplicationMenu(menu)
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (process.env.ELECTRON_START_URL) mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
