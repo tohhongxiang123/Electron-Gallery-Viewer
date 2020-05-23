@@ -112,7 +112,7 @@ async function openFile() {
     mainWindow.webContents.send('select-file', image)
 }
 
-async function openFolder() {
+async function openFolder(initialFolder) {
     const { filePaths } = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],
         filters: [{
@@ -123,5 +123,6 @@ async function openFolder() {
 
     const folder = filePaths[0]
     if (!folder) return
+
     mainWindow.webContents.send('select-folder', folder)
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styles from './ImageViewer.module.scss'
 
 const electron = window.require('electron')
@@ -20,12 +20,19 @@ export default function ImageViewer() {
 
         ipcRenderer.on('select-folder', (event, directory) => {
             setCurrentFileIndex(0)
+            localStorage.setItem('folder', directory)
 
             fs.readdir(directory, (err, files) => {
+                if (err) return console.log(err)
                 const absolutePathFiles = files.map(file => `${directory}/${file}`)
                 setImages(absolutePathFiles)
             })
         })
+
+        const initialFolder = localStorage.getItem('folder')
+        if (initialFolder) {
+            openFolder(initialFolder)
+        }
     }, [])
 
     useEffect(() => {
@@ -34,6 +41,7 @@ export default function ImageViewer() {
 
         setIsLoading(true)
         const selectedFile = fs.readFile(currentFile.toString(), (err, data) => {
+            if (err) return console.log(err)
             const image = "data:image/png;base64," + data.toString('base64')
             setImage(image)
             setIsLoading(false)
@@ -41,32 +49,14 @@ export default function ImageViewer() {
         setImage(selectedFile)
     }, [currentFileIndex, images])
 
-    const handleImageChange = (direction) => {
+    const handleImageChange = useCallback((direction) => {
         setCurrentFileIndex(c => ((c + direction) % images.length) > 0 ? (c + direction) % images.length : ((c + direction) % images.length) + images.length)
-    }
+    }, [images.length])
 
-    const selectRandomImage = () => {
+    const selectRandomImage = useCallback(() => {
         const randomIndex = Math.floor(Math.random() * images.length)
         setCurrentFileIndex(randomIndex)
-    }
-
-    useEffect(() => {
-        function handleKeyDown(e) {
-            switch (e.code) {
-                case "Space":
-                    return selectRandomImage()
-                case "ArrowLeft":
-                    return handleImageChange(-1)
-                case "ArrowRight":
-                    return handleImageChange(1)
-                default:
-                    return
-            }
-        }
-
-        window.addEventListener("keydown", handleKeyDown)
-        return () => window.removeEventListener("keydown", handleKeyDown)
-    })
+    }, [images.length])
 
     const [duration, setDuration] = useState(1)
     const handleDurationChange = e => {
@@ -76,7 +66,7 @@ export default function ImageViewer() {
         return setDuration(updatedValue)
     }
     const [timer, setTimer] = useState(null)
-    const toggleSlideShow = () => {
+    const toggleSlideShow = useCallback(() => {
         if (Number.isNaN(parseFloat(duration))) return
         if (!timer) {
             const interval = setInterval(selectRandomImage, duration * 1000)
@@ -85,7 +75,34 @@ export default function ImageViewer() {
 
         clearInterval(timer)
         return setTimer(null)
-    }
+    }, [duration, selectRandomImage, timer])
+
+    useEffect(() => {
+        function handleKeyDown(e) {
+            switch (e.code) {
+                case "Space":
+                    selectRandomImage()
+                    break
+                case "ArrowLeft":
+                    handleImageChange(-1)
+                    break
+                case "ArrowRight":
+                    handleImageChange(1)
+                    break
+                case "Enter":
+                    toggleSlideShow()
+                    break;
+                default:
+                    return
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown)
+        }
+    }, [handleImageChange, selectRandomImage, toggleSlideShow])
+
 
     return (
         <div className={styles.root}>
@@ -97,16 +114,17 @@ export default function ImageViewer() {
                         <div>
                             <p><em>No images selected</em></p>
                             <button onClick={openFile}>Open file</button>
-                            <button onClick={openFolder}>Open directory</button>
+                            <button onClick={() => openFolder()}>Open directory</button>
                         </div>
                 }
             </div>
             {images.length > 1 && <div className={styles.footer}>
-            {!timer && (
+                {!timer && (
                     <>
                         <button onClick={() => handleImageChange(-1)}>Previous</button>
                         <button onClick={() => handleImageChange(1)}>Next</button>
                         <button onClick={selectRandomImage}>Shuffle</button>
+                        <button onClick={() => openFolder()}>Open directory</button>
                         <input value={duration} type="number" onChange={handleDurationChange} />
                     </>
                 )}
@@ -116,7 +134,11 @@ export default function ImageViewer() {
     )
 }
 
-async function openFolder() {
+async function openFolder(initialFolder) {
+    if (initialFolder) {
+        return remote.getCurrentWebContents().send('select-folder', initialFolder)
+    }
+
     const { filePaths } = await dialog.showOpenDialog(remote.getCurrentWindow(), {
         properties: ['openDirectory'],
         filters: [{

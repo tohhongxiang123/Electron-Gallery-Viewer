@@ -21,7 +21,7 @@
     "electron": "electron .",
     "dev": "nodemon --watch ./src --exec \"npm run start\"",
     "precompile": "react-scripts build",
-    "compile": "electron-packager . \"Gallery Viewer\" --platform=win32 --arch=x64 --ignore=/src --ignore=/node_modules --no-prune --overwrite --out ./executable"
+    "compile": "electron-packager . \"Gallery Viewer\" --platform=win32 --arch=x64 --ignore=/src --overwrite --out ./executable"
   },
   "eslintConfig": {
     "extends": "react-app"
