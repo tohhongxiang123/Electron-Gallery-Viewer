@@ -17,7 +17,13 @@
 .footer {
     grid-area: footer;
     padding: 1em;
+    border-top: 1px solid #ccc;
     display: flex;
     justify-content: space-around;
     align-items: center;
+}
+
+.controlSlideShow {
+    display: grid;
+    grid-template-columns: auto auto;
 }

@@ -113,22 +113,25 @@ export default function ImageViewer() {
                         <img src={image} alt="" style={{ maxWidth: '100%', maxHeight: '100%' }} /> :
                         <div>
                             <p><em>No images selected</em></p>
-                            <button onClick={openFile}>Open file</button>
-                            <button onClick={() => openFolder()}>Open directory</button>
+                            <button onClick={openFile} className="button">Open file</button>
+                            <button onClick={() => openFolder()} className="button">Open directory</button>
                         </div>
                 }
             </div>
             {images.length > 1 && <div className={styles.footer}>
                 {!timer && (
                     <>
-                        <button onClick={() => handleImageChange(-1)}>Previous</button>
-                        <button onClick={() => handleImageChange(1)}>Next</button>
-                        <button onClick={selectRandomImage}>Shuffle</button>
-                        <button onClick={() => openFolder()}>Open directory</button>
-                        <input value={duration} type="number" onChange={handleDurationChange} />
+                        <button onClick={() => handleImageChange(-1)} className="button">Previous</button>
+                        <button onClick={() => handleImageChange(1)} className="button">Next</button>
+                        <button onClick={selectRandomImage} className="button">Shuffle</button>
+                        <button onClick={() => openFolder()} className="button">Open directory</button>
+
                     </>
                 )}
-                <button onClick={toggleSlideShow}>{timer ? 'Stop' : 'Start'} Random slideshow</button>
+                <div className={styles.controlSlideShow}>
+                    <input value={duration} className="input" type="number" onChange={handleDurationChange} />
+                    <button onClick={toggleSlideShow} className="button">{timer ? 'Stop' : 'Start'} Random slideshow</button>
+                </div>
             </div>}
         </div>
     )

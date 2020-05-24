@@ -1,5 +1,5 @@
 import React from 'react'
-import './App.css'
+import './App.scss'
 import ImageViewer from './components/ImageViewer'
 
 export default function App() {
