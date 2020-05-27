@@ -12,6 +12,7 @@
     display:flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
 }
 
 .footer {
@@ -24,6 +25,15 @@
 }
 
 .controlSlideShow {
-    display: grid;
-    grid-template-columns: auto auto;
+    display: flex;
+}
+
+.isFullScreen {
+    display: block;
+}
+
+.closeFullScreenButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }

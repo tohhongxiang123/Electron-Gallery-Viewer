@@ -104,8 +104,10 @@ export default function ImageViewer() {
     }, [handleImageChange, selectRandomImage, toggleSlideShow])
 
 
+    const [fullScreen, setFullScreen] = useState(false)
+    const toggleFullScreen = () => setFullScreen(s => !s)
     return (
-        <div className={styles.root}>
+        <div className={`${styles.root} ${fullScreen ? styles.isFullScreen : ''}`}>
             <div className={styles.gallery}>
                 {isLoading ?
                     <p>Loading...</p> :
@@ -118,21 +120,24 @@ export default function ImageViewer() {
                         </div>
                 }
             </div>
-            {images.length > 1 && <div className={styles.footer}>
+            {!fullScreen ? <div className={styles.footer}>
                 {!timer && (
-                    <>
-                        <button onClick={() => handleImageChange(-1)} className="button">Previous</button>
-                        <button onClick={() => handleImageChange(1)} className="button">Next</button>
-                        <button onClick={selectRandomImage} className="button">Shuffle</button>
-                        <button onClick={() => openFolder()} className="button">Open directory</button>
-
-                    </>
+                    <div className="buttons has-addons is-centered is-marginless">
+                        <button onClick={() => handleImageChange(-1)} className="button is-marginless">Previous</button>
+                        <button onClick={() => handleImageChange(1)} className="button is-marginless">Next</button>
+                        <button onClick={selectRandomImage} className="button is-marginless">Shuffle</button>
+                        <button onClick={() => openFolder()} className="button is-marginless">Open directory</button>
+                    </div>
                 )}
                 <div className={styles.controlSlideShow}>
                     <input value={duration} className="input" type="number" onChange={handleDurationChange} />
                     <button onClick={toggleSlideShow} className="button">{timer ? 'Stop' : 'Start'} Random slideshow</button>
+                    <button onClick={toggleFullScreen} className="button">Full Screen</button>
                 </div>
-            </div>}
+            </div> : <button onClick={() => {
+                toggleFullScreen()
+                if (timer) toggleSlideShow()
+            }} className={`delete ${styles.closeFullScreenButton}`}></button>}
         </div>
     )
 }
