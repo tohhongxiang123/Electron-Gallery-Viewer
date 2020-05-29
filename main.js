@@ -96,28 +96,28 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 
 // open file
-const fs = require('fs')
+// const fs = require('fs')
 async function openFile() {
     const { filePaths } = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
         filters: [{
-            name: 'Images',
-            extensions: ['jpg', 'png', 'jpeg']
+            name: 'Images or Videos',
+            extensions: ['jpg', 'png', 'jpeg', 'mp4', 'mkv']
         }]
     })
 
     const file = filePaths[0]
     if (!file) return;
 
-    mainWindow.webContents.send('select-file', image)
+    mainWindow.webContents.send('select-file', file)
 }
 
 async function openFolder(initialFolder) {
     const { filePaths } = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],
         filters: [{
-            name: 'Images',
-            extensions: ['jpg', 'png', 'jpeg']
+            name: 'Images or Videos',
+            extensions: ['jpg', 'png', 'jpeg', 'mp4', 'mkv']
         }]
     })
 

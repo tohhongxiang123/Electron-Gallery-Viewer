@@ -103,7 +103,6 @@ export default function ImageViewer() {
         }
     }, [handleImageChange, selectRandomImage, toggleSlideShow])
 
-
     const [fullScreen, setFullScreen] = useState(false)
     const toggleFullScreen = () => setFullScreen(s => !s)
     return (
@@ -111,13 +110,16 @@ export default function ImageViewer() {
             <div className={styles.gallery}>
                 {isLoading ?
                     <p>Loading...</p> :
-                    image ?
-                        <img src={image} alt="" style={{ maxWidth: '100%', maxHeight: '100%' }} /> :
+                    !image ?
                         <div>
                             <p><em>No images selected</em></p>
                             <button onClick={openFile} className="button">Open file</button>
                             <button onClick={() => openFolder()} className="button">Open directory</button>
-                        </div>
+                        </div> :
+                        isFileImage(images[currentFileIndex]) ?
+                            <img src={image} alt="" style={{ maxWidth: '100%', maxHeight: '100%' }} /> :
+                            <video src={image} />
+
                 }
             </div>
             {!fullScreen ? <div className={styles.footer}>
@@ -151,7 +153,7 @@ async function openFolder(initialFolder) {
         properties: ['openDirectory'],
         filters: [{
             name: 'Images',
-            extensions: ['jpg', 'png', 'jpeg']
+            extensions: ['jpg', 'png', 'jpeg', 'mp4', 'mkv']
         }]
     })
 
@@ -165,7 +167,7 @@ async function openFile() {
         properties: ['openFile'],
         filters: [{
             name: 'Images',
-            extensions: ['jpg', 'png', 'jpeg']
+            extensions: ['jpg', 'png', 'jpeg', 'mp4', 'mkv']
         }]
     })
 
@@ -173,4 +175,11 @@ async function openFile() {
     if (!file) return;
 
     remote.getCurrentWebContents().send('select-file', file)
+}
+
+function isFileImage(fileName) {
+    const imageExtensions = ['jpg', 'png', 'jpeg']
+    const currentFileExtension = fileName.split('.')[fileName.split('.').length - 1]
+
+    return imageExtensions.includes(currentFileExtension)
 }
