@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import styles from './ImageViewer.module.scss'
+import DisplayLocalImage from './DisplayLocalImage'
+import Masonry from 'react-masonry-css'
+import DisplayMasonry from './DisplayMasonry'
 
 const electron = window.require('electron')
 const ipcRenderer = electron.ipcRenderer
@@ -8,9 +11,7 @@ const remote = electron.remote
 const fs = window.require('fs')
 
 export default function ImageViewer() {
-    const [image, setImage] = useState(null)
     const [images, setImages] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
     const [currentFileIndex, setCurrentFileIndex] = useState(0)
 
     useEffect(() => {
@@ -19,8 +20,9 @@ export default function ImageViewer() {
         })
 
         ipcRenderer.on('select-folder', (event, directory) => {
+            console.log('folder selected')
             setCurrentFileIndex(0)
-            localStorage.setItem('folder', directory)
+            // localStorage.setItem('folder', directory)
 
             fs.readdir(directory, (err, files) => {
                 if (err) return console.log(err)
@@ -28,34 +30,10 @@ export default function ImageViewer() {
                 setImages(absolutePathFiles)
             })
         })
-
-        const initialFolder = localStorage.getItem('folder')
-        if (initialFolder) {
-            openFolder(initialFolder)
-        }
     }, [])
-
-    useEffect(() => {
-        const currentFile = images[currentFileIndex]
-        if (!currentFile) return
-
-        setIsLoading(true)
-        const selectedFile = fs.readFile(currentFile.toString(), (err, data) => {
-            if (err) return console.log(err)
-            const image = "data:image/png;base64," + data.toString('base64')
-            setImage(image)
-            setIsLoading(false)
-        })
-        setImage(selectedFile)
-    }, [currentFileIndex, images])
 
     const handleImageChange = useCallback((direction) => {
         setCurrentFileIndex(c => ((c + direction) % images.length) > 0 ? (c + direction) % images.length : ((c + direction) % images.length) + images.length)
-    }, [images.length])
-
-    const selectRandomImage = useCallback(() => {
-        const randomIndex = Math.floor(Math.random() * images.length)
-        setCurrentFileIndex(randomIndex)
     }, [images.length])
 
     const [duration, setDuration] = useState(1)
@@ -65,7 +43,12 @@ export default function ImageViewer() {
         if (Number.isNaN(updatedValue)) return
         return setDuration(updatedValue)
     }
+
     const [timer, setTimer] = useState(null)
+    const selectRandomImage = useCallback(() => {
+        const randomIndex = Math.floor(Math.random() * images.length)
+        setCurrentFileIndex(randomIndex)
+    }, [images.length])
     const toggleSlideShow = useCallback(() => {
         if (Number.isNaN(parseFloat(duration))) return
         if (!timer) {
@@ -76,6 +59,28 @@ export default function ImageViewer() {
         clearInterval(timer)
         return setTimer(null)
     }, [duration, selectRandomImage, timer])
+
+    const shuffle = () => {
+        setImages(prevImages => {
+            const result = [...prevImages]
+            let currentIndex = result.length
+            let temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = result[currentIndex];
+                result[currentIndex] = result[randomIndex];
+                result[randomIndex] = temporaryValue;
+            }
+            return result
+        })
+    }
 
     useEffect(() => {
         function handleKeyDown(e) {
@@ -105,41 +110,63 @@ export default function ImageViewer() {
 
     const [fullScreen, setFullScreen] = useState(false)
     const toggleFullScreen = () => setFullScreen(s => !s)
+
+    const [isGalleryView, setIsGalleryView] = useState(false)
+    const toggleGalleryView = () => setIsGalleryView(c => !c)
+    const [numberOfColumns, setNumberOfColumns] = useState(2)
+    const handleColumnsChange = e => {
+        if (!e.target.value) return setNumberOfColumns("")
+        const updatedValue = parseFloat(e.target.value)
+        if (Number.isNaN(updatedValue)) return
+        return setNumberOfColumns(updatedValue)
+    }
+
     return (
         <div className={`${styles.root} ${fullScreen ? styles.isFullScreen : ''}`}>
             <div className={styles.gallery}>
-                {isLoading ?
-                    <p>Loading...</p> :
-                    !image ?
+                {!images[currentFileIndex] ?
+                    <div className={styles.flexCenter}>
+                        <p><em>No images selected</em></p>
+                        <button onClick={openFile} className="button">Open file</button>
+                        <button onClick={() => openFolder()} className="button">Open directory</button>
+                    </div> :
+                    isGalleryView ? (
                         <div>
-                            <p><em>No images selected</em></p>
-                            <button onClick={openFile} className="button">Open file</button>
-                            <button onClick={() => openFolder()} className="button">Open directory</button>
-                        </div> :
-                        isFileImage(images[currentFileIndex]) ?
-                            <img src={image} alt="" style={{ maxWidth: '100%', maxHeight: '100%' }} /> :
-                            <video src={image} />
-
+                            <DisplayMasonry images={images} cols={numberOfColumns} />
+                        </div>
+                    ) : <div className={styles.flexCenter}>
+                            <DisplayLocalImage src={images[currentFileIndex]} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                        </div>
                 }
             </div>
-            {!fullScreen ? <div className={styles.footer}>
-                {!timer && (
-                    <div className="buttons has-addons is-centered is-marginless">
-                        <button onClick={() => handleImageChange(-1)} className="button is-marginless">Previous</button>
-                        <button onClick={() => handleImageChange(1)} className="button is-marginless">Next</button>
-                        <button onClick={selectRandomImage} className="button is-marginless">Shuffle</button>
-                        <button onClick={() => openFolder()} className="button is-marginless">Open directory</button>
-                    </div>
-                )}
-                <div className={styles.controlSlideShow}>
-                    <input value={duration} className="input" type="number" onChange={handleDurationChange} />
-                    <button onClick={toggleSlideShow} className="button">{timer ? 'Stop' : 'Start'} Random slideshow</button>
-                    <button onClick={toggleFullScreen} className="button">Full Screen</button>
-                </div>
-            </div> : <button onClick={() => {
-                toggleFullScreen()
-                if (timer) toggleSlideShow()
-            }} className={`delete ${styles.closeFullScreenButton}`}></button>}
+            {!fullScreen ?
+                <div className={styles.footer}>
+                    {!timer && (
+                        <div className="buttons has-addons is-centered is-marginless">
+                            <button onClick={() => handleImageChange(-1)} className="button is-marginless">Previous</button>
+                            <button onClick={() => handleImageChange(1)} className="button is-marginless">Next</button>
+                            <button onClick={selectRandomImage} className="button is-marginless">Random Image</button>
+                            <button onClick={shuffle} className="button is-marginless">Shuffle</button>
+                            <button onClick={toggleGalleryView} className="button is-marginless">Toggle View</button>
+                            <button onClick={() => openFolder()} className="button is-marginless">Open directory</button>
+                            <button onClick={toggleFullScreen} className="button is-marginless">Full Screen</button>
+                        </div>
+                    )}
+                    {isGalleryView ? (
+                        <div className={styles.controlSlideShow}>
+                            <label htmlFor="#numberOfCols" style={{ margin: '0.5rem' }}>Columns</label>
+                            <input id="numberOfCols" value={numberOfColumns} className="input" type="number" onChange={handleColumnsChange} />
+                        </div>
+                    ) : (
+                            <div className={styles.controlSlideShow}>
+                                <input value={duration} className="input" type="number" onChange={handleDurationChange} />
+                                <button onClick={toggleSlideShow} className="button">{timer ? 'Stop' : 'Start'} Random slideshow</button>
+                            </div>
+                        )}
+                </div> : <button onClick={() => {
+                    toggleFullScreen()
+                    if (timer) toggleSlideShow()
+                }} className={`delete ${styles.closeFullScreenButton}`}></button>}
         </div>
     )
 }
@@ -177,9 +204,9 @@ async function openFile() {
     remote.getCurrentWebContents().send('select-file', file)
 }
 
-function isFileImage(fileName) {
-    const imageExtensions = ['jpg', 'png', 'jpeg']
-    const currentFileExtension = fileName.split('.')[fileName.split('.').length - 1]
+// function isFileImage(fileName) {
+//     const imageExtensions = ['jpg', 'png', 'jpeg']
+//     const currentFileExtension = fileName.split('.')[fileName.split('.').length - 1]
 
-    return imageExtensions.includes(currentFileExtension)
-}
+//     return imageExtensions.includes(currentFileExtension)
+// }

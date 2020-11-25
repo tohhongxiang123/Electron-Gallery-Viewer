@@ -1,18 +1,29 @@
 .root {
     display: grid;
     height: 100vh;
+    width: 100vw;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
-    grid-template-areas: 'gallery'
-    'footer';
+    grid-template-areas: 'gallery' 'footer';
+    overflow: hidden;
+}
+
+.flexCenter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .gallery {
     grid-area: gallery;
-    display:flex;
-    justify-content: center;
-    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
     height: 100%;
+    width: 100%;
+    position: relative;
 }
 
 .footer {
@@ -26,6 +37,8 @@
 
 .controlSlideShow {
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .isFullScreen {

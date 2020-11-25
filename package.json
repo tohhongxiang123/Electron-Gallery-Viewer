@@ -1,49 +1,51 @@
 {
-  "name": "electrondemo",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "bulma": "^0.8.2",
-    "node-sass": "^4.14.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
-  },
-  "main": "main.js",
-  "homepage": "./",
-  "scripts": {
-    "start": "concurrently \"set BROWSER=none && react-scripts start\" \"set ELECTRON_START_URL=http://localhost:3000 && electron .\"",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron": "electron .",
-    "dev": "nodemon --watch ./src --exec \"npm run start\"",
-    "precompile": "react-scripts build",
-    "compile": "electron-packager . \"Gallery Viewer\" --platform=win32 --arch=x64 --ignore=/src --overwrite --out ./executable"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "concurrently": "^5.2.0",
-    "electron": "^9.0.0",
-    "electron-packager": "^14.2.1",
-    "electron-reload": "^1.5.0",
-    "nodemon": "^2.0.4"
-  }
+    "name": "electrondemo",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@testing-library/jest-dom": "^4.2.4",
+        "@testing-library/react": "^9.5.0",
+        "@testing-library/user-event": "^7.2.1",
+        "bulma": "^0.8.2",
+        "node-sass": "^4.14.1",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
+        "react-lazy-load-image-component": "^1.5.0",
+        "react-masonry-css": "^1.0.14",
+        "react-scripts": "^4.0.1"
+    },
+    "main": "main.js",
+    "homepage": "./",
+    "scripts": {
+        "start": "concurrently \"set BROWSER=none && react-scripts start\" \"set ELECTRON_START_URL=http://localhost:3000 && electron .\"",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "electron": "electron .",
+        "dev": "nodemon --watch * --exec \"npm run start\"",
+        "precompile": "react-scripts build",
+        "compile": "electron-packager . \"Gallery Viewer\" --platform=win32 --arch=x64 --ignore=/src --overwrite --out ./executable"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "concurrently": "^5.2.0",
+        "electron": "^9.0.0",
+        "electron-packager": "^15.1.0",
+        "electron-reload": "^1.5.0",
+        "nodemon": "^2.0.4"
+    }
 }
