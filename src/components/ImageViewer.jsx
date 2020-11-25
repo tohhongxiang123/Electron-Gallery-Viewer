@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import styles from './ImageViewer.module.scss'
 import DisplayLocalImage from './DisplayLocalImage'
-import Masonry from 'react-masonry-css'
 import DisplayMasonry from './DisplayMasonry'
 
 const electron = window.require('electron')
