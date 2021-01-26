@@ -124,16 +124,16 @@ export default function ImageViewer() {
         <div className={`${styles.root} ${fullScreen ? styles.isFullScreen : ''}`}>
             <div className={styles.gallery}>
                 {!images[currentFileIndex] ?
-                    <div className={styles.flexCenter}>
+                    <div className={styles.chooseFileOrFolder}>
                         <p><em>No images selected</em></p>
                         <button onClick={openFile} className="button">Open file</button>
                         <button onClick={() => openFolder()} className="button">Open directory</button>
                     </div> :
                     isGalleryView ? (
-                        <div>
+                        <div style={{ position: 'relative' }}>
                             <DisplayMasonry images={images} cols={numberOfColumns} />
                         </div>
-                    ) : <div className={styles.flexCenter}>
+                    ) : <div className={styles.singleImage}>
                             <DisplayLocalImage src={images[currentFileIndex]} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                         </div>
                 }
@@ -142,13 +142,8 @@ export default function ImageViewer() {
                 <div className={styles.footer}>
                     {!timer && (
                         <div className="buttons has-addons is-centered is-marginless">
-                            <button onClick={() => handleImageChange(-1)} className="button is-marginless">Previous</button>
-                            <button onClick={() => handleImageChange(1)} className="button is-marginless">Next</button>
-                            <button onClick={selectRandomImage} className="button is-marginless">Random Image</button>
-                            <button onClick={shuffle} className="button is-marginless">Shuffle</button>
                             <button onClick={toggleGalleryView} className="button is-marginless">Toggle View</button>
                             <button onClick={() => openFolder()} className="button is-marginless">Open directory</button>
-                            <button onClick={toggleFullScreen} className="button is-marginless">Full Screen</button>
                         </div>
                     )}
                     {isGalleryView ? (
@@ -158,10 +153,17 @@ export default function ImageViewer() {
                         </div>
                     ) : (
                             <div className={styles.controlSlideShow}>
+                                <button onClick={() => handleImageChange(-1)} className="button is-marginless">Previous</button>
+                                <button onClick={() => handleImageChange(1)} className="button is-marginless">Next</button>
+                                <button onClick={selectRandomImage} className="button is-marginless">Random Image</button>
                                 <input value={duration} className="input" type="number" onChange={handleDurationChange} />
                                 <button onClick={toggleSlideShow} className="button">{timer ? 'Stop' : 'Start'} Random slideshow</button>
                             </div>
                         )}
+                    <div className="buttons has-addons is-centered is-marginless">
+                        <button onClick={toggleFullScreen} className="button is-marginless">Full Screen</button>
+                        <button onClick={shuffle} className="button is-marginless">Shuffle</button>
+                    </div>
                 </div> : <button onClick={() => {
                     toggleFullScreen()
                     if (timer) toggleSlideShow()
@@ -202,10 +204,3 @@ async function openFile() {
 
     remote.getCurrentWebContents().send('select-file', file)
 }
-
-// function isFileImage(fileName) {
-//     const imageExtensions = ['jpg', 'png', 'jpeg']
-//     const currentFileExtension = fileName.split('.')[fileName.split('.').length - 1]
-
-//     return imageExtensions.includes(currentFileExtension)
-// }

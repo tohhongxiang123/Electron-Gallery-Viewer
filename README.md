@@ -4,7 +4,6 @@
     - Previous/Next navigation
     - Go to random image
     - Random order slideshow
-    - Masonry View (Using Intersection Observers)
 
 # Building
 ```

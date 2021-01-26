@@ -1,19 +1,28 @@
 .root {
     display: grid;
-    height: 100vh;
-    width: 100vw;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
     grid-template-areas: 'gallery' 'footer';
     overflow: hidden;
 }
 
-.flexCenter {
+.singleImage {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
+    max-height: 100vh;
+    padding-bottom: 4em;
+}
+
+.chooseFileOrFolder {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    grid-gap: 20px;
+    padding: 20px;
 }
 
 .gallery {
@@ -27,12 +36,14 @@
 }
 
 .footer {
-    grid-area: footer;
     padding: 1em;
-    border-top: 1px solid #ccc;
+    width: 100%;
     display: flex;
     justify-content: space-around;
     align-items: center;
+    position: fixed;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .controlSlideShow {
@@ -46,7 +57,7 @@
 }
 
 .closeFullScreenButton {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
 }
