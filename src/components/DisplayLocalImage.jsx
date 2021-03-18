@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import { useRef } from 'react';
 
 const fs = window.require('fs')
-export default function DisplayLocalImage({ src, ...props }) {
+
+function DisplayLocalImage({ src, ...props }) {
     const [image, setImage] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
+
     const imageRef = useRef(null)
     const observer = useRef(null)
 
@@ -23,6 +25,7 @@ export default function DisplayLocalImage({ src, ...props }) {
     useEffect(() => {
         loadUpImage()
     }, [loadUpImage])
+
     useEffect(() => {
         if (observer.current) observer.current.disconnect()
         observer.current = new window.IntersectionObserver(([entry]) => {
@@ -44,3 +47,5 @@ export default function DisplayLocalImage({ src, ...props }) {
         <img ref={imageRef} alt={src} {...props} src={image} />
     )
 }
+
+export default DisplayLocalImage
