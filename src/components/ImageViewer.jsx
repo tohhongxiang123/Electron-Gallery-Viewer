@@ -25,11 +25,17 @@ export default function ImageViewer() {
 
             fs.readdir(directory, (err, files) => {
                 if (err) return console.log(err)
-                const absolutePathFiles = files.map(file => `${directory}/${file}`)
-                setImages(absolutePathFiles)
+                const filesData = files.map(file => ({
+                    path: `${directory}/${file}`,
+                    lastModified: fs.statSync(`${directory}/${file}`).mtime.getTime()
+                }))
+
+                setImages(filesData)
             })
         })
     }, [])
+
+    console.log(images)
 
     const handleImageChange = useCallback((direction) => {
         setCurrentFileIndex(c => ((c + direction) % images.length) > 0 ? (c + direction) % images.length : ((c + direction) % images.length) + images.length)
@@ -120,6 +126,12 @@ export default function ImageViewer() {
         return setNumberOfColumns(updatedValue)
     }
 
+    const [shouldSortAscending, setShouldSortAscending] = useState(false)
+    const sortImages = () => {
+        setImages(prevImages => prevImages.sort((a, b) => shouldSortAscending ? a.lastModified - b.lastModified : b.lastModified - a.lastModified))
+        setShouldSortAscending(c => !c)
+    }
+
     return (
         <div className={`${styles.root} ${fullScreen ? styles.isFullScreen : ''}`}>
             <div className={styles.gallery}>
@@ -131,10 +143,10 @@ export default function ImageViewer() {
                     </div> :
                     isGalleryView ? (
                         <div style={{ position: 'relative' }}>
-                            <DisplayMasonry images={images} cols={numberOfColumns} />
+                            <DisplayMasonry images={images.map(image => image.path)} cols={numberOfColumns} />
                         </div>
                     ) : <div className={styles.singleImage}>
-                            <DisplayLocalImage src={images[currentFileIndex]} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                            <DisplayLocalImage src={images[currentFileIndex].path} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                         </div>
                 }
             </div>
@@ -163,6 +175,7 @@ export default function ImageViewer() {
                     <div className="buttons has-addons is-centered is-marginless">
                         <button onClick={toggleFullScreen} className="button is-marginless">Full Screen</button>
                         <button onClick={shuffle} className="button is-marginless">Shuffle</button>
+                        <button onClick={sortImages} className="button is-marginless">Sort by Date</button>
                     </div>
                 </div> : <button onClick={() => {
                     toggleFullScreen()
@@ -186,6 +199,7 @@ async function openFolder(initialFolder) {
     })
 
     const folder = filePaths[0]
+    console.log(folder)
     if (!folder) return
     remote.getCurrentWebContents().send('select-folder', folder)
 }

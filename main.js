@@ -121,6 +121,7 @@ async function openFolder(initialFolder) {
     })
 
     const folder = filePaths[0]
+    console.log(folder)
     if (!folder) return
 
     mainWindow.webContents.send('select-folder', folder)
